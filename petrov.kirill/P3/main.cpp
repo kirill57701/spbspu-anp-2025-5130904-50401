@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <cstdlib>
+#include <cstddef>
 
 /*
 Memory: malloc/free
@@ -16,6 +17,7 @@ namespace petrov
     int** makefixmassive(size_t a, size_t b);
     size_t calculatediagonal(int ** mtx, size_t a, size_t b);
     size_t minn(size_t a, size_t b);
+    void freefixmassive(int** mtx, size_t a);
 }
 
 int petrov::isitnumber(const char* a)
@@ -88,6 +90,18 @@ size_t petrov::calculatediagonal(int ** mtx, size_t a, size_t b)
     return s;
 }
 
+void petrov::freefixmassive(int** mtx, size_t a)
+{
+    if (mtx != nullptr)
+    {
+        for (size_t i = 0; i < a; ++i)
+        {
+            free(mtx[i]);
+        }
+        free(mtx);
+    }
+}
+
 int main(int argc, char ** argv)
 {
     if (argc < 4)
@@ -129,6 +143,10 @@ int main(int argc, char ** argv)
                 in >> mtx[i][j];
             }
         }
-        std::cout << petrov::calculatediagonal(mtx, a, b) << "\n";
+        std::ofstream ou(argv[3]);
+        ou << petrov::calculatediagonal(mtx, a, b);
+        ou.close();
+        in.close();
+        petrov::freefixmassive(mtx, a);
     }
 }
