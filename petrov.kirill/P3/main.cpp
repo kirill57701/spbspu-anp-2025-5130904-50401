@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 
-namespace petrov
+namespace petrov 
 {
     int isitnumber(const char* a);
     int isitoneortwo(const char* a);
@@ -48,6 +48,14 @@ int main(int argc, char ** argv)
         std::cerr << "First parameter is out of range\n";
         return 1;
     }
+    std::ifstream in(argv[2]);
+    size_t a, b;
+    in >> a >> b;
+    in.close();
+    if (in.fail())
+    {
+        std::cout << "Error of getting massive\n";
+        return 2;
+    }
 }
  
-
