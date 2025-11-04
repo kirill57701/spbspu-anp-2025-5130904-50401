@@ -35,10 +35,10 @@ int petrov::isitnumber(const char* a)
 int ** petrov::makefixmassive(size_t a, size_t b)
 {
     size_t c = petrov::minn(a, b);
-    int** m = (int**)malloc(c*sizeof(int*));
+    int** m = static_cast<int**>(malloc(c*sizeof(int*)));
         for (size_t i = 0; i < c; ++i)
         {
-            m[i] = (int*)malloc(c*sizeof(int));
+            m[i] = static_cast<int*>(malloc(c*sizeof(int)));
         }
     return m;
 }
