@@ -13,6 +13,9 @@ namespace petrov
 {
     int isitnumber(const char* a);
     int isitoneortwo(const char* a);
+    int** makefixmassive(size_t a, size_t b);
+    size_t calculatediagonal(int ** mtx, size_t a, size_t b);
+    size_t minn(size_t a, size_t b);
 }
 
 int petrov::isitnumber(const char* a)
@@ -29,8 +32,60 @@ int petrov::isitnumber(const char* a)
     return 1;
 }
 
-int petrov::isitoneortwo(const char* a){
+int ** petrov::makefixmassive(size_t a, size_t b)
+{
+    size_t c = petrov::minn(a, b);
+    int** m = (int**)malloc(c*sizeof(int*));
+        for (size_t i = 0; i < c; ++i)
+        {
+            m[i] = (int*)malloc(c*sizeof(int));
+        }
+    return m;
+}
+
+int petrov::isitoneortwo(const char* a)
+{
     return ((a[0] == '1' || a[0] == '2') && a[1] == '\0') ? 1 : 0;
+}
+
+size_t petrov::minn(size_t a, size_t b)
+{
+    return a > b ? b : a;
+}
+
+size_t petrov::calculatediagonal(int ** mtx, size_t a, size_t b)
+{
+    size_t i = petrov::minn(a, b) - 1, j = 0, s = 0, c = 1;
+    size_t q = petrov::minn(a, b);
+    bool d = 1;
+    while (c < q)
+    {
+        while (i > q - c - 1)
+        {
+            if (mtx[i][j] == 0)
+            {
+                d = 0;
+            }
+            i--;
+            j++;
+        }
+        s += d, i = q - 1, j = c, c++, d = 1;
+    }
+    c = 1, i = 0, j = q - 1;
+    while (c < q)
+    {
+        while (j > q - c - 1)
+        {
+            if (mtx[i][j] == 0)
+            {
+                d = 0;
+            }
+            i++;
+            j--;
+        }
+        s += d, i = q - c - 1, j = q - 1, c++, d = 1;
+    }
+    return s;
 }
 
 int main(int argc, char ** argv)
@@ -63,19 +118,17 @@ int main(int argc, char ** argv)
         std::cout << "Error of getting massive\n";
         return 2;
     }
-    if (argv[1][0] == '2')
+    if (argv[1][0] == '1')
     {
-        int ** mtx = (int**)malloc(a*sizeof(int*));
-        for (int i = 0; i < a; ++i)
+        int ** mtx = petrov::makefixmassive(a, b);
+        size_t c = petrov::minn(a, b);
+        for (size_t i = 0; i < c; ++i)
         {
-            mtx[i] = (int*)malloc(b*sizeof(int));
-        }
-        for (size_t i = 0; i < a; ++i)
-        {
-            for (size_t j = 0; j < b; ++j)
+            for (size_t j = 0; j < c; ++j)
             {
                 in >> mtx[i][j];
             }
         }
+        std::cout << petrov::calculatediagonal(mtx, a, b) << "\n";
     }
 }
