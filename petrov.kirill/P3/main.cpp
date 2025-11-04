@@ -9,7 +9,7 @@ Var-1: CNT-NZR-DIG
 Var-2: FLL-INC-WAV
 */
 
-namespace petrov 
+namespace petrov
 {
     int isitnumber(const char* a);
     int isitoneortwo(const char* a);
