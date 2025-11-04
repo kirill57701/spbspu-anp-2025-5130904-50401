@@ -1,6 +1,13 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <cstdlib>
+
+/*
+Memory: malloc/free
+Var-1: CNT-NZR-DIG
+Var-2: FLL-INC-WAV
+*/
 
 namespace petrov 
 {
@@ -51,11 +58,24 @@ int main(int argc, char ** argv)
     std::ifstream in(argv[2]);
     size_t a, b;
     in >> a >> b;
-    in.close();
     if (in.fail())
     {
         std::cout << "Error of getting massive\n";
         return 2;
     }
+    if (argv[1][0] == '2')
+    {
+        int ** mtx = (int**)malloc(a*sizeof(int*));
+        for (int i = 0; i < a; ++i)
+        {
+            mtx[i] = (int*)malloc(b*sizeof(int));
+        }
+        for (size_t i = 0; i < a; ++i)
+        {
+            for (size_t j = 0; j < b; ++j)
+            {
+                in >> mtx[i][j];
+            }
+        }
+    }
 }
- 
