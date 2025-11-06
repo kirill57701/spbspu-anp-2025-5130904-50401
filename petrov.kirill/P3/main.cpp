@@ -7,10 +7,10 @@ namespace petrov
 {
     bool isitnum(char* a);
     int gettypemass(char* a);
-    int** makemtx(char* argv);
+    int** makemtx(char* argv, size_t& rows, size_t& cols);
     void freemtx(int** a, size_t b);
-    void cntnzrdig(char* a, int** mtx, char* o);
     void fllincway(char* a, int** mtx, char* o);
+    void cntnzrdig(char* a, int** mtx, char* o);
 }
 
 bool petrov::isitnum(char* a)
@@ -34,105 +34,158 @@ int petrov::gettypemass(char* a)
     else{return -1;}
 }
 
-int** petrov::makemtx(char* agrv)
+int** petrov::makemtx(char* argv, size_t& rows, size_t& cols)
 {
-    std::ifstream in(agrv);
-    size_t a, b;
-    in >> a >> b;
-    int** c = reinterpret_cast<int**>(malloc(a*sizeof(int*)));
-    for (size_t i = 0; i < a; ++i)
+    std::ifstream in(argv);
+    if (!in.is_open())
     {
-        c[i] = reinterpret_cast<int*>(malloc(b*sizeof(int)));
+        throw std::invalid_argument("Cannot open file");
     }
-    for (size_t i = 0; i < a; ++i)
+    in >> rows >> cols;
+    if (rows == 0 || cols == 0)
     {
-        for (size_t j = 0; j < b; ++j)
+        in.close();
+        return nullptr;
+    }
+    int** matrix = new int*[rows];
+    for (size_t i = 0; i < rows; ++i)
+    {
+        matrix[i] = new int[cols];
+    }
+    for (size_t i = 0; i < rows; ++i)
+    {
+        for (size_t j = 0; j < cols; ++j)
         {
-            if (in.eof()){throw std::logic_error("too small args");}
-            in >> c[i][j];
-        }
+            if (in.eof())
+            {
+                for (size_t k = 0; k <= i; ++k)
+                {
+                    delete[] matrix[k];
+                }
+                delete[] matrix;
+                in.close();
+                throw std::logic_error("too small args");
+            }
+            in >> matrix[i][j];
+        }   
     }
     if (in.fail())
     {
+        for (size_t i = 0; i < rows; ++i)
+        {
+            delete[] matrix[i];
+        }
+        delete[] matrix;
+        in.close();
         throw std::invalid_argument("err");
     }
     in.close();
-    return c;
+    return matrix;
 }
 
 void petrov::freemtx(int** a, size_t b)
 {
+    if (a == nullptr) return;
     for (size_t i = 0; i < b; ++i)
     {
-        free(a[i]);
+        delete[] a[i];
     }
-    free(a);
+    delete[] a;
 }
 
 void petrov::fllincway(char* a, int** mtx, char* o)
 {
     std::ifstream in(a);
-    size_t s = 0, c, b, q = 0;
-    in >> c >> b;
+    size_t rows = 0, cols = 0;
+    in >> rows >> cols;
     in.close();
-    c > b ? c = b : c = c;
-    size_t i = 0, j = c - 1;
-    bool iszero = 1;
-    while (q < c - 1)
+    if (mtx == nullptr || rows == 0 || cols == 0)
     {
-        while (i < c - 1)
+        std::ofstream ou(o);
+        ou << "0\n";
+        ou.close();
+        return;
+    }
+    size_t min_dim = (rows < cols) ? rows : cols;
+    size_t count = 0;
+    size_t q = 0;
+    size_t i = 0, j = min_dim - 1;
+    bool isNonZero = true;
+    while (q < min_dim - 1)
+    {
+        while (i < min_dim - 1 && j > 0)
         {
             if (mtx[i][j] == 0)
             {
-                iszero = 0;
+                isNonZero = false;
             }
             i++;
             j--;
         }
-        q++, s += iszero, i = q, j = c - q - 1, iszero = 1;
+        if (isNonZero) count++;
+        q++;
+        i = q;
+        j = min_dim - q - 1;
+        isNonZero = true;
     }
-    i = c - 1, q = 0, j = 0, iszero = 1;
-    while (q < c - 1)
+    i = min_dim - 1;
+    q = 0;
+    j = 0;
+    isNonZero = true;
+    while (q < min_dim - 1)
     {
-        while (j < c - 1)
+        while (j < min_dim - 1 && i > 0)
         {
             if (mtx[i][j] == 0)
             {
-                iszero = 0;
+                isNonZero = false;
             }
-            j++, i--;
+            j++;
+            i--;
         }
-        q++, s += iszero, i = c - 1 - q, j = q, iszero = 1;
+        if (isNonZero) count++;
+        q++;
+        i = min_dim - 1 - q;
+        j = q;
+        isNonZero = true;
     }
     std::ofstream ou(o);
-    ou << s << "\n";
+    ou << count << "\n";
+    ou.close();
 }
 
 void petrov::cntnzrdig(char* a, int** mtx, char* o)
 {
-    size_t c = 0, b, q;
+    size_t rows = 0, cols = 0;
     std::ifstream in(a);
-    in >> b >> q;
+    in >> rows >> cols;
     in.close();
-    q > b ? q = b : q = q;
-    while (c < b/2)
+    if (mtx == nullptr || rows == 0 || cols == 0)
     {
-        for (size_t i = 0; i < q; ++i)
+        std::ofstream ou(o, std::ios::app);
+        ou.close();
+        return;
+    }
+    size_t min_dim = (rows < cols) ? rows : cols;
+    size_t layer = 0;
+    while (layer < min_dim / 2)
+    {
+        for (size_t i = 0; i < min_dim; ++i)
         {
-            for (size_t j = 0; j < q; ++j)
+            for (size_t j = 0; j < min_dim; ++j)
             {
-                if (i == c || i == q - c - 1 || j == c || j == q - c - 1)
+                if (i == layer || i == min_dim - layer - 1 || j == layer || j == min_dim - layer - 1)
                 {
-                    mtx[i][j] = mtx[i][j] + c + 1;
+                    mtx[i][j] = mtx[i][j] + layer + 1;
                 }
             }
         }
-        c++;
+        layer++;
     }
     std::ofstream ou(o, std::ios::app);
-    for (size_t i = 0; i < q; ++i)
+    for (size_t i = 0; i < min_dim; ++i)
     {
-        for (size_t j = 0; j < q; ++j)
+        for (size_t j = 0; j < min_dim; ++j)
         {
             ou << mtx[i][j] << " ";
         }
@@ -157,31 +210,36 @@ int main(int argc, char** argv)
         std::cerr << "First parameter is not a number\n";
         return 1;
     }
-    int c = petrov::gettypemass(argv[1]);
-    if (c != 1 && c != 2)
+    int array_type = petrov::gettypemass(argv[1]);
+    if (array_type != 1 && array_type != 2)
     {
         std::cerr << "First parameter is out of range\n";
         return 1;
     }
-    if (c == 1)
+    if (array_type == 1)
     {
-        try{
-            int** d = petrov::makemtx(argv[2]);
-            size_t rows;
-            std::ifstream in(argv[2]);
-            in >> rows;
-            petrov::fllincway(argv[2], d, argv[3]);
-            petrov::cntnzrdig(argv[2], d, argv[3]);
-            petrov::freemtx(d, rows);
-            in.close();
+        try
+        {
+            size_t rows = 0, cols = 0;
+            int** matrix = petrov::makemtx(argv[2], rows, cols);
+            petrov::fllincway(argv[2], matrix, argv[3]);
+            petrov::cntnzrdig(argv[2], matrix, argv[3]);
+            petrov::freemtx(matrix, rows);
             return 0;
-        }catch(...){
-            std::cerr << "error\n";
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "error: " << e.what() << "\n";
+            return 2;
+        }
+        catch(...)
+        {
+            std::cerr << "unknown error\n";
             return 2;
         }
     }
-  else
+    else
     {
-    return 0;
+        return 0;
     }
 }
