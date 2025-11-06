@@ -67,7 +67,7 @@ int** petrov::makemtx(char* argv, size_t& rows, size_t& cols)
                 throw std::logic_error("too small args");
             }
             in >> matrix[i][j];
-        }   
+        }
     }
     if (in.fail())
     {
