@@ -50,7 +50,7 @@ int** petrov::makemtx(char* agrv)
         {
             if (in.eof()){throw std::logic_error("too small args");}
             in >> c[i][j];
-        }   
+        }
     }
     if (in.fail())
     {
