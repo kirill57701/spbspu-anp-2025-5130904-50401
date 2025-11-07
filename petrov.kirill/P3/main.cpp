@@ -7,10 +7,10 @@ namespace petrov
 {
     bool isitnum(char* a);
     int gettypemass(char* a);
-    int** makemtx(char* argv);
+    int** makemtx(char* argv, size_t& b, size_t& c);
     void freemtx(int** a, size_t b);
-    void cntnzrdig(char* a, int** mtx, char* o);
-    void fllincway(char* a, int** mtx, char* o);
+    void cntnzrdig(size_t b, size_t c, int** mtx, char* o);
+    void fllincway(size_t b, size_t c, int** mtx, char* o);
 }
 
 bool petrov::isitnum(char* a)
@@ -29,32 +29,55 @@ bool petrov::isitnum(char* a)
 
 int petrov::gettypemass(char* a)
 {
-    if (a[0] == '1' && a[1] == '\0'){return 1;}
+    if (a[0] == '1' && a[1] == '\0')
+    {
+    return 1;
+    }
     else if(a[0] == '2' && a[1] == '\0'){return 2;}
     else{return -1;}
 }
 
-int** petrov::makemtx(char* agrv)
+int** petrov::makemtx(char* agrv, size_t& a, size_t& b)
 {
     std::ifstream in(agrv);
-    size_t a, b;
+    if (!in.is_open()){throw std::logic_error("err");}
+
     in >> a >> b;
-    int** c = reinterpret_cast<int**>(malloc(a*sizeof(int*)));
+    if (in.fail()){throw std::invalid_argument("err");}
+    if (a == 0 || b == 0){throw std::invalid_argument("err");}
+
+    int** c = reinterpret_cast<int**>(malloc(a * sizeof(int*)));
+    if (!c){throw std::logic_error("err");}
+
     for (size_t i = 0; i < a; ++i)
     {
-        c[i] = reinterpret_cast<int*>(malloc(b*sizeof(int)));
+        c[i] = reinterpret_cast<int*>(malloc(b * sizeof(int)));
+        if (!c[i])
+        {
+            for (size_t j = 0; j < i; ++j){free(c[j]);}
+            free(c);
+            throw std::logic_error("err");
+        }
     }
+
     for (size_t i = 0; i < a; ++i)
     {
         for (size_t j = 0; j < b; ++j)
         {
-            if (in.eof()){throw std::logic_error("too small args");}
+            if (in.eof())
+            {
+                for (size_t k = 0; k < a; ++k){free(c[k]);}
+                free(c);
+                throw std::logic_error("err");
+            }
             in >> c[i][j];
+            if (in.fail())
+            {
+                for (size_t k = 0; k < a; ++k){free(c[k]);}
+                free(c);
+                throw std::invalid_argument("err");
+            }
         }
-    }
-    if (in.fail())
-    {
-        throw std::invalid_argument("err");
     }
     in.close();
     return c;
@@ -69,75 +92,61 @@ void petrov::freemtx(int** a, size_t b)
     free(a);
 }
 
-void petrov::fllincway(char* a, int** mtx, char* o)
+void petrov::fllincway(size_t b, size_t c, int** mtx, char* o)
 {
-    std::ifstream in(a);
-    size_t s = 0, c, b, q = 0;
-    in >> c >> b;
-    in.close();
-    c > b ? c = b : c = c;
-    size_t i = 0, j = c - 1;
+    size_t n = (b < c) ? b : c;
+    size_t s = 0, q = 0;
+    size_t i = 0, j = n - 1;
     bool iszero = 1;
-    while (q < c - 1)
+    while (q < n - 1)
     {
-        while (i < c - 1)
+        while (i < n - 1)
         {
-            if (mtx[i][j] == 0)
-            {
-                iszero = 0;
-            }
+            if (mtx[i][j] == 0){iszero = 0;}
             i++;
             j--;
         }
-        q++, s += iszero, i = q, j = c - q - 1, iszero = 1;
+        q++, s += iszero, i = q, j = n - q - 1, iszero = 1;
     }
-    i = c - 1, q = 0, j = 0, iszero = 1;
-    while (q < c - 1)
+    i = n - 1, q = 0, j = 0, iszero = 1;
+    while (q < n - 1)
     {
-        while (j < c - 1)
+        while (j < n - 1)
         {
-            if (mtx[i][j] == 0)
-            {
-                iszero = 0;
-            }
+            if (mtx[i][j] == 0){iszero = 0;}
             j++, i--;
         }
-        q++, s += iszero, i = c - 1 - q, j = q, iszero = 1;
+        q++, s += iszero, i = n - 1 - q, j = q, iszero = 1;
     }
     std::ofstream ou(o);
     ou << s << "\n";
 }
 
-void petrov::cntnzrdig(char* a, int** mtx, char* o)
+void petrov::cntnzrdig(size_t b, size_t c, int** mtx, char* o)
 {
-    size_t c = 0, b, q;
-    std::ifstream in(a);
-    in >> b >> q;
-    in.close();
-    std::ofstream ou(o, std::ios::app);
-    ou << b << " " << q << " ";
-    q > b ? q = b : q = q;
-    while (c < b/2)
+    size_t n = (b < c) ? b : c;
+    size_t cnt = 0;
+    while (cnt < n/2)
     {
-        for (size_t i = 0; i < q; ++i)
+        for (size_t i = 0; i < n; ++i)
         {
-            for (size_t j = 0; j < q; ++j)
+            for (size_t j = 0; j < n; ++j)
             {
-                if (i == c || i == q - c - 1 || j == c || j == q - c - 1)
+                if (i == cnt || i == n - cnt - 1 || j == cnt || j == n - cnt - 1)
                 {
-                    mtx[i][j] = mtx[i][j] + c + 1;
+                    mtx[i][j] = mtx[i][j] + cnt + 1;
                 }
             }
         }
-        c++;
+        cnt++;
     }
-    if (b%2 != 0)
+    if (n % 2 != 0){mtx[n/2][n/2] += cnt + 1;}
+
+    std::ofstream ou(o, std::ios::app);
+    ou << b << " " << c << " ";
+    for (size_t i = 0; i < b; ++i)
     {
-        mtx[b/2][b/2] += c + 1;
-    }
-    for (size_t i = 0; i < q; ++i)
-    {
-        for (size_t j = 0; j < q; ++j)
+        for (size_t j = 0; j < c; ++j)
         {
             ou << mtx[i][j] << " ";
         }
@@ -171,14 +180,11 @@ int main(int argc, char** argv)
     if (c == 2)
     {
         try{
-            int** d = petrov::makemtx(argv[2]);
-            size_t rows;
-            std::ifstream in(argv[2]);
-            in >> rows;
-            petrov::fllincway(argv[2], d, argv[3]);
-            petrov::cntnzrdig(argv[2], d, argv[3]);
+            size_t rows, cols;
+            int** d = petrov::makemtx(argv[2], rows, cols);
+            petrov::fllincway(rows, cols, d, argv[3]);
+            petrov::cntnzrdig(rows, cols, d, argv[3]);
             petrov::freemtx(d, rows);
-            in.close();
             return 0;
         }catch(...){
             std::cerr << "error\n";
@@ -187,8 +193,45 @@ int main(int argc, char** argv)
     }
     else
     {
-        return 0;
+        try
+        {
+            std::ifstream in(argv[2]);
+            if (!in.is_open())
+            {
+                std::cerr << "Cannot open input file\n";
+                return 1;
+            }
+            size_t rows, cols;
+            in >> rows >> cols;
+            if (in.fail())
+            {
+                std::cerr << "Invalid matrix dimensions\n";
+                return 1;
+            }
+            int temp;
+            for (size_t i = 0; i < rows; ++i)
+            {
+                for (size_t j = 0; j < cols; ++j)
+                {
+                    if (in.eof())
+                    {
+                        std::cerr << "Not enough data in file\n";
+                        return 1;
+                    }
+                    in >> temp;
+                    if (in.fail())
+                    {
+                        std::cerr << "Invalid data in file\n";
+                        return 1;
+                    }
+                }
+            }
+            return 0;
+        }
+        catch(...)
+        {
+            std::cerr << "Error processing static array\n";
+            return 1;
+        }
     }
 }
-
-
