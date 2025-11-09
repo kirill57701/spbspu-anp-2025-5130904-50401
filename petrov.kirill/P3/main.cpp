@@ -9,6 +9,7 @@ namespace petrov
     int gettypemass(char* a);
     int* makemtx(char* a);
     void fillincway(char* a, char* b, int* mtx);
+    void cntnzrdig(char* a, char* b, int* mtx);
 }
 
 bool petrov::isitnum(char* a)
@@ -109,6 +110,44 @@ void petrov::fillincway(char* a, char* b, int* mtx)
     ou.close();
 }
 
+void petrov::cntnzrdig(char* a, char* b, int* mtx)
+{
+    size_t r, c;
+    std::ifstream in(a);
+    in >> r >> c;
+    r = r > c ? c : r;
+    in.close();
+    size_t d = 1;
+    while (d < r)
+    {
+        for (size_t i = 0; i < r; ++i)
+        {
+            for (size_t j = 0; j < r; ++j)
+            {
+                if (i >= d - 1 && i < r - d + 1 && j >= d - 1 && j < r - d + 1)
+                {
+                    mtx[i*r + j]++;
+                }
+            }
+        }
+        d++;
+    }
+    if (r%2 != 0)
+    {
+        mtx[r + 1]--;
+    }
+    std::ofstream ou(b, std::ios::app);
+    ou << "\n" << r << " " << r << " ";
+    for (size_t i = 0; i < r; ++i)
+    {
+        for (size_t j = 0; j < r; ++j)
+        {
+            ou << mtx[i*r + j] << " ";
+        }
+    }
+    ou.close();
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 4)
@@ -145,6 +184,7 @@ int main(int argc, char** argv)
             return 2;
         }
         petrov::fillincway(argv[2], argv[3], mtx);
+        petrov::cntnzrdig(argv[2], argv[3], mtx);
         free(mtx);
         return 0;
     }
