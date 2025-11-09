@@ -43,11 +43,8 @@ int* petrov::makemtx(char* a)
     }
     b > c ? b = c : b = b;
     int* mtx;
-    try
-    {
-        mtx = reinterpret_cast<int*>(malloc(sizeof(int)*b*b));
-    }
-    catch (...)
+    mtx = reinterpret_cast<int*>(malloc(sizeof(int)*b*b));
+    if (mtx == nullptr)
     {
         throw std::logic_error("err");
     }
@@ -57,11 +54,13 @@ int* petrov::makemtx(char* a)
         {
             if (in.eof() && i != b*b - 1)
             {
+                free(mtx);
                 throw std::logic_error("err");
             }
             in >> mtx[i];
             if (in.fail())
             {
+                free(mtx);
                 throw std::logic_error("err");
             }
         }
@@ -146,10 +145,6 @@ int main(int argc, char** argv)
             return 2;
         }
         petrov::fillincway(argv[2], argv[3], mtx);
-        c++;
-    }
-    if (c == 2)
-    {
         free(mtx);
         return 0;
     }
