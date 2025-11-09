@@ -42,7 +42,7 @@ int* petrov::makemtx(char* a)
     {
         throw std::logic_error("err");
     }
-    b > c ? b = c : b = b;
+    b = (b > c) ? c : b;
     int* mtx;
     mtx = reinterpret_cast<int*>(malloc(sizeof(int)*b*b));
     if (mtx == nullptr)
@@ -68,7 +68,7 @@ int* petrov::makemtx(char* a)
     }
     catch (...)
     {
-        free (mtx);
+        free(mtx);
         throw;
     }
     in.close();
@@ -132,10 +132,6 @@ void petrov::cntnzrdig(char* a, char* b, int* mtx)
         }
         d++;
     }
-    if (r%2 != 0)
-    {
-        mtx[r + 1]--;
-    }
     std::ofstream ou(b, std::ios::app);
     ou << "\n" << r << " " << r << " ";
     for (size_t i = 0; i < r; ++i)
@@ -171,21 +167,33 @@ int main(int argc, char** argv)
         std::cerr << "First parameter is out of range\n";
         return 1;
     }
-    int* mtx;
     if (c == 1)
     {
+        int* mtx = nullptr;
         try
         {
             mtx = petrov::makemtx(argv[2]);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "err\n";
+            return 2;
         }
         catch(...)
         {
             std::cerr << "err\n";
             return 2;
         }
-        petrov::fillincway(argv[2], argv[3], mtx);
-        petrov::cntnzrdig(argv[2], argv[3], mtx);
-        free(mtx);
+        if (mtx != nullptr)
+        {
+            petrov::fillincway(argv[2], argv[3], mtx);
+            petrov::cntnzrdig(argv[2], argv[3], mtx);
+            free(mtx);
+        }
+        return 0;
+    }
+    else if (c == 2)
+    {
         return 0;
     }
 }
