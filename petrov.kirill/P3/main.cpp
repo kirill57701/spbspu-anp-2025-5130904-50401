@@ -112,6 +112,6 @@ int main(int argc, char** argv)
     }
     if (c == 2)
     {
-      freemtx(mtx);
+     petrov::freemtx(mtx);
     }
 }
