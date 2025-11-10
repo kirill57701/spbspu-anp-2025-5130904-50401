@@ -113,4 +113,5 @@ int main(int argc, char** argv)
     {
         petrov::freemtx(mtx);
     }
+    return 0;
 }
