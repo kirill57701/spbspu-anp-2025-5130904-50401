@@ -2,14 +2,15 @@
 #include <memory>
 #include <cstddef>
 #include <fstream>
+#include <stdexcept>
 
 namespace petrov
 {
     bool isitnum(char* a);
     int gettypemass(char* a);
-    void makestatmtx(std::ifstream& in, size_t r, size_t c, long long * statmtx);
-    long long* makemtx(size_t , size_t c);
-    void freemtx(long long* mtx);
+    int* makemtx(char* a);
+    void fillincway(char* b, int* mtx, size_t n);
+    void cntnzrdig(char* b, int* mtx, size_t n);
 }
 
 bool petrov::isitnum(char* a)
@@ -33,30 +34,126 @@ int petrov::gettypemass(char* a)
     else{return -1;}
 }
 
-void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, long long * statmtx)
+int* petrov::makemtx(char* a)
 {
-    for (size_t i = 0; i < r; ++i)
+    std::ifstream in(a);
+    if (!in.is_open())
     {
-        for (size_t j = 0; j < c; ++j)
+        throw std::logic_error("err");
+    }
+    size_t b, c;
+    in >> b >> c;
+    if (in.fail() || in.eof())
+    {
+        throw std::logic_error("err");
+    }
+    if (b == 0 || c == 0)
+    {
+        return nullptr;
+    }
+    size_t n = (b > c) ? c : b;
+    int* mtx = reinterpret_cast<int*>(malloc(sizeof(int) * n * n));
+    if (mtx == nullptr)
+    {
+        throw std::logic_error("err");
+    }
+    try
+    {
+        for (size_t i = 0; i < n * n; ++i)
         {
-            in >> statmtx[i*r + j];
+            if (in.eof())
+            {
+                free(mtx);
+                throw std::logic_error("err");
+            }
+            in >> mtx[i];
+            if (in.fail())
+            {
+                free(mtx);
+                throw std::logic_error("err");
+            }
         }
     }
-}
-
-long long* petrov::makemtx(size_t r, size_t c)
-{
-    long long* matrix = reinterpret_cast<long long*>(malloc(sizeof(long long)*r*c));
-    if (matrix == nullptr)
+    catch (...)
     {
-        throw std::bad_alloc();
+        free(mtx);
+        throw;
     }
-    return matrix;
+    in.close();
+    return mtx;
 }
 
-void petrov::freemtx(long long* mtx)
+void petrov::fillincway(char* b, int* mtx, size_t n)
 {
-    free(mtx);
+    if (mtx == nullptr || n == 0)
+    {
+        std::ofstream ou(b);
+        ou << 0;
+        ou.close();
+        return;
+    }
+    size_t s = 0, q = 0;
+    size_t i = 0, j = n - 1;
+    bool iszero = 1;
+    while (q < n - 1)
+    {
+        while (i < n - 1)
+        {
+            if (mtx[i*n + j] == 0){iszero = 0;}
+            i++;
+            j--;
+        }
+        q++, s += iszero, i = q, j = n - q - 1, iszero = 1;
+    }
+    i = n - 1, q = 0, j = 0, iszero = 1;
+    while (q < n - 1)
+    {
+        while (j < n - 1)
+        {
+            if (mtx[i* n + j] == 0){iszero = 0;}
+            j++, i--;
+        }
+        q++, s += iszero, i = n - 1 - q, j = q, iszero = 1;
+    }
+    std::ofstream ou(b);
+    ou << s;
+    ou.close();
+}
+
+void petrov::cntnzrdig(char* b, int* mtx, size_t n)
+{
+    if (mtx == nullptr || n == 0)
+    {
+        std::ofstream ou(b, std::ios::app);
+        ou << "\n" << 0 << " " << 0 << " ";
+        ou.close();
+        return;
+    }
+    size_t d = 1;
+    while (d < n + 1)
+    {
+        for (size_t i = 0; i < n; ++i)
+        {
+            for (size_t j = 0; j < n; ++j)
+            {
+                if (i >= d - 1 && i < n - d + 1 && j >= d - 1 && j < n - d + 1)
+                {
+                    mtx[i*n + j]++;
+                }
+            }
+        }
+        d++;
+    }
+    std::ofstream ou(b, std::ios::app);
+    ou << "\n" << n << " " << n << " ";
+    for (size_t i = 0; i < n; ++i)
+    {
+        for (size_t j = 0; j < n; ++j)
+        {
+            ou << mtx[i*n + j] << " ";
+        }
+    }
+    ou.close();
 }
 
 int main(int argc, char** argv)
@@ -82,36 +179,47 @@ int main(int argc, char** argv)
         std::cerr << "First parameter is out of range\n";
         return 1;
     }
-    size_t rows = 0, cols = 0;
-    std::ifstream in(argv[2]);
-    in >> rows >> cols;
-    long long statmtx[10000];
-    long long * mtx = nullptr;
     if (c == 1)
     {
-        petrov::makestatmtx(in, rows, cols, statmtx);
-        if (!in)
-        {
-            std::cerr << "err\n";
-            return 2;
-        }
-    }
-    else
-    {
+        int* mtx = nullptr;
+        size_t n = 0;
         try
         {
-            mtx = petrov::makemtx(rows, cols);
+            mtx = petrov::makemtx(argv[2]);
+            std::ifstream in(argv[2]);
+            if (in.is_open())
+            {
+                size_t b, c;
+                in >> b >> c;
+                if (!in.fail())
+                {
+                    n = (b > c) ? c : b;
+                }
+                in.close();
+            }
         }
-        catch(const std::bad_alloc&)
+        catch(const std::exception& e)
         {
-            std::cerr << "exception, err\n";
-            petrov::freemtx(mtx);
             return 2;
         }
+        catch(...)
+        {
+            return 2;
+        }
+        petrov::fillincway(argv[3], mtx, n);
+        petrov::cntnzrdig(argv[3], mtx, n);
+        if (mtx != nullptr)
+        {
+            free(mtx);
+        }
+        return 0;
     }
-    if (c == 2)
+    else if (c == 2)
     {
-        petrov::freemtx(mtx);
+        std::ofstream ou(argv[3]);
+        ou << 0;
+        ou << "\n" << 0 << " " << 0 << " ";
+        ou.close();
+        return 0;
     }
-    return 0;
 }
