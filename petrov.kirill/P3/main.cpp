@@ -9,8 +9,8 @@ namespace petrov
     bool isitnum(char* a);
     int gettypemass(char* a);
     int* makemtx(char* a);
-    void fillincway(char* a, char* b, int* mtx, size_t n);
-    void cntnzrdig(char* a, char* b, int* mtx, size_t n);
+    void fillincway(char* b, int* mtx, size_t n);
+    void cntnzrdig(char* b, int* mtx, size_t n);
 }
 
 bool petrov::isitnum(char* a)
@@ -83,7 +83,7 @@ int* petrov::makemtx(char* a)
     return mtx;
 }
 
-void petrov::fillincway(char* a, char* b, int* mtx, size_t n)
+void petrov::fillincway(char* b, int* mtx, size_t n)
 {
     if (mtx == nullptr || n == 0)
     {
@@ -120,7 +120,7 @@ void petrov::fillincway(char* a, char* b, int* mtx, size_t n)
     ou.close();
 }
 
-void petrov::cntnzrdig(char* a, char* b, int* mtx, size_t n)
+void petrov::cntnzrdig(char* b, int* mtx, size_t n)
 {
     if (mtx == nullptr || n == 0)
     {
@@ -208,8 +208,8 @@ int main(int argc, char** argv)
             std::cerr << "err\n";
             return 2;
         }
-        petrov::fillincway(argv[2], argv[3], mtx, n);
-        petrov::cntnzrdig(argv[2], argv[3], mtx, n);
+        petrov::fillincway(argv[3], mtx, n);
+        petrov::cntnzrdig(argv[3], mtx, n);
         if (mtx != nullptr)
         {
             free(mtx);
