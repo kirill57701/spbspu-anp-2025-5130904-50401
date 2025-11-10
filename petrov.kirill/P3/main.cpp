@@ -48,7 +48,7 @@ void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
     r = r > c ? c : r;
     if (r == 0)
     {
-        throw std::logic_error("err");
+        throw std::runtime_error("err");
     }
     size_t s = 0;
     for (size_t i = 0; i < r; ++i)
@@ -79,7 +79,7 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
     r = r > c ? c : r;
     if (r == 0)
     {
-        throw std::logic_error("err");
+        throw std::runtime_error("err");
     }
     mtx = reinterpret_cast<int*>(malloc(sizeof(int)*r*r));
     if (mtx == nullptr)
@@ -206,7 +206,7 @@ int main(int argc, char** argv)
         {
             petrov::makestatmtx(in, rows, cols, statmtx);
         }
-        catch(const std::logic_error&)
+        catch(const std::runtime_error&)
         {
             return 0;
         }
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
         {
             mtx = petrov::makemtx(in, rows, cols);
         }
-        catch(const std::logic_error&)
+        catch(const std::runtime_error&)
         {
             return 0;
         }
