@@ -7,9 +7,9 @@ namespace petrov
 {
     bool isitnum(char* a);
     int gettypemass(char* a);
-    void makestatmtx(std::ifstream& in, size_t r, size_t c, long * statmtx);
-    long* makemtx(size_t , size_t c);
-    void freemtx(long* mtx);
+    void makestatmtx(std::ifstream& in, size_t r, size_t c, long long * statmtx);
+    long long* makemtx(size_t , size_t c);
+    void freemtx(long long* mtx);
 }
 
 bool petrov::isitnum(char* a)
@@ -33,7 +33,7 @@ int petrov::gettypemass(char* a)
     else{return -1;}
 }
 
-void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, long * statmtx)
+void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, long long * statmtx)
 {
     for (size_t i = 0; i < r; ++i)
     {
@@ -44,10 +44,9 @@ void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, long * statmtx)
     }
 }
 
-long* petrov::makemtx(size_t r, size_t c)
+long long* petrov::makemtx(size_t r, size_t c)
 {
-    r = (r > c) ? c : r;
-    long* matrix = reinterpret_cast<long*>(malloc(sizeof(int)*r*r));
+    long long* matrix = reinterpret_cast<long long*>(malloc(sizeof(long long)*r*c));
     if (matrix == nullptr)
     {
         throw std::bad_alloc();
@@ -55,7 +54,7 @@ long* petrov::makemtx(size_t r, size_t c)
     return matrix;
 }
 
-void petrov::freemtx(long* mtx)
+void petrov::freemtx(long long* mtx)
 {
     free(mtx);
 }
@@ -86,8 +85,8 @@ int main(int argc, char** argv)
     size_t rows = 0, cols = 0;
     std::ifstream in(argv[2]);
     in >> rows >> cols;
-    long statmtx[10000];
-    long * mtx = nullptr;
+    long long statmtx[10000];
+    long long * mtx = nullptr;
     if (c == 1)
     {
         petrov::makestatmtx(in, rows, cols, statmtx);
@@ -112,6 +111,6 @@ int main(int argc, char** argv)
     }
     if (c == 2)
     {
-     petrov::freemtx(mtx);
+        petrov::freemtx(mtx);
     }
 }
