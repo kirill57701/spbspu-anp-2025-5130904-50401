@@ -101,20 +101,15 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
             s++;
         }
     }
-    while (!in.eof())
+    for (size_t i = r*r; i < w; ++i)
     {
+        if (in.eof())
+        {
+            throw std::logic_error("err");
+        }
         in >> q;
-        s++;
     }
-    if (s < r*r)
-    {
-        throw std::logic_error("err");
-    }
-    else if(s < w)
-    {
-        throw std::logic_error("err");
-    }
-    else if (in.fail())
+    if (in.fail())
     {
         throw std::logic_error("err");
     }
