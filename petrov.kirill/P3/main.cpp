@@ -206,6 +206,10 @@ int main(int argc, char** argv)
         {
             petrov::makestatmtx(in, rows, cols, statmtx);
         }
+        catch(std::logic_error)
+        {
+            return 0;
+        }
         catch(...)
         {
             std::cerr << "err\n";
@@ -221,6 +225,10 @@ int main(int argc, char** argv)
         try
         {
             mtx = petrov::makemtx(in, rows, cols);
+        }
+        catch(std::logic_error)
+        {
+            return 0;
         }
         catch(const std::bad_alloc&)
         {
