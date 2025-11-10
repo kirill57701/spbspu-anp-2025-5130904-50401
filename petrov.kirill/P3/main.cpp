@@ -95,6 +95,7 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
         {
             if (in.eof())
             {
+                free(mtx);
                 throw std::logic_error("err");
             }
             in >> mtx[i*r + j];
@@ -105,12 +106,14 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
     {
         if (in.eof())
         {
+            free(mtx);
             throw std::logic_error("err");
         }
         in >> q;
     }
     if (in.fail())
     {
+        free(mtx);
         throw std::logic_error("err");
     }
     return mtx;
@@ -234,6 +237,7 @@ int main(int argc, char** argv)
         }
         catch(const std::runtime_error&)
         {
+            free(mtx);
             return 0;
         }
         catch(const std::bad_alloc&)
