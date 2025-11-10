@@ -53,6 +53,14 @@ void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
         {
             in >> statmtx[i*r + j];
             s++;
+            if (s >= 10000)
+            {
+                break;
+            }
+        }
+        if (s >= 10000)
+        {
+            break;
         }
     }
     if (s < r*r)
@@ -81,6 +89,14 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
         {
             in >> mtx[i*r + j];
             s++;
+            if (s >= 10000)
+            {
+                break;
+            }
+        }
+        if (s >= 10000)
+        {
+            break;
         }
     }
     if (s < r*r)
