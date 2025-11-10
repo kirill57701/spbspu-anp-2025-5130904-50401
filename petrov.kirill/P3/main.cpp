@@ -46,7 +46,7 @@ int petrov::gettypemass(char* a)
 void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
 {
     r = r > c ? c : r;
-    int s = 0;
+    size_t s = 0;
     for (size_t i = 0; i < r; ++i)
     {
         for (size_t j = 0; j < r; ++j)
@@ -74,7 +74,7 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
     {
         throw std::bad_alloc();
     }
-    int s = 0;
+    size_t s = 0;
     for (size_t i = 0; i < r; ++i)
     {
         for (size_t j = 0; j < r; ++j)
