@@ -40,6 +40,7 @@ int* petrov::makemtx(char* a)
     in >> b >> c;
     if (in.fail())
     {
+        in.close();
         throw std::logic_error("err");
     }
     b = (b > c) ? c : b;
@@ -118,7 +119,7 @@ void petrov::cntnzrdig(char* a, char* b, int* mtx)
     r = r > c ? c : r;
     in.close();
     size_t d = 1;
-    while (d < r)
+    while (d < r + 1)
     {
         for (size_t i = 0; i < r; ++i)
         {
