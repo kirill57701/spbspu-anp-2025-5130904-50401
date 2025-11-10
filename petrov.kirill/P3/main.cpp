@@ -46,21 +46,21 @@ int petrov::gettypemass(char* a)
 void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
 {
     r = r > c ? c : r;
+    if (r == 0)
+    {
+        throw std::logic_error("err");
+    }
     size_t s = 0;
     for (size_t i = 0; i < r; ++i)
     {
         for (size_t j = 0; j < r; ++j)
         {
+            if (in.eof())
+            {
+                throw std::logic_error("err");
+            }
             in >> statmtx[i*r + j];
             s++;
-            if (s >= 10000)
-            {
-                break;
-            }
-        }
-        if (s >= 10000)
-        {
-            break;
         }
     }
     if (s < r*r)
@@ -77,6 +77,10 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
 {
     int* mtx;
     r = r > c ? c : r;
+    if (r == 0)
+    {
+        throw std::logic_error("err");
+    }
     mtx = reinterpret_cast<int*>(malloc(sizeof(int)*r*r));
     if (mtx == nullptr)
     {
@@ -87,16 +91,12 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
     {
         for (size_t j = 0; j < r; ++j)
         {
+            if (in.eof())
+            {
+                throw std::logic_error("err");
+            }
             in >> mtx[i*r + j];
             s++;
-            if (s >= 10000)
-            {
-                break;
-            }
-        }
-        if (s >= 10000)
-        {
-            break;
         }
     }
     if (s < r*r)
