@@ -76,6 +76,8 @@ void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
 int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
 {
     int* mtx;
+    int q;
+    size_t w = r*c;
     r = r > c ? c : r;
     if (r == 0)
     {
@@ -99,11 +101,20 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
             s++;
         }
     }
+    while (!in.eof())
+    {
+        in >> q;
+        s++;
+    }
     if (s < r*r)
     {
         throw std::logic_error("err");
     }
-    if (in.fail())
+    else if(s < w)
+    {
+        throw std::logic_error("err");
+    }
+    else if (in.fail())
     {
         throw std::logic_error("err");
     }
