@@ -11,6 +11,7 @@ namespace petrov
     int* makemtx(char* a);
     void fillincway(char* b, int* mtx, size_t n);
     void cntnzrdig(char* b, int* mtx, size_t n);
+    bool processStaticArray(char* inputFile, char* outputFile);
 }
 
 bool petrov::isitnum(char* a)
@@ -45,39 +46,36 @@ int* petrov::makemtx(char* a)
     in >> b >> c;
     if (in.fail() || in.eof())
     {
+        in.close();
         throw std::logic_error("err");
     }
     if (b == 0 || c == 0)
     {
+        in.close();
         return nullptr;
     }
     size_t n = (b > c) ? c : b;
     int* mtx = reinterpret_cast<int*>(malloc(sizeof(int) * n * n));
     if (mtx == nullptr)
     {
+        in.close();
         throw std::logic_error("err");
     }
-    try
+    for (size_t i = 0; i < n * n; ++i)
     {
-        for (size_t i = 0; i < n * n; ++i)
+        if (in.eof())
         {
-            if (in.eof())
-            {
-                free(mtx);
-                throw std::logic_error("err");
-            }
-            in >> mtx[i];
-            if (in.fail())
-            {
-                free(mtx);
-                throw std::logic_error("err");
-            }
+            free(mtx);
+            in.close();
+            throw std::logic_error("err");
         }
-    }
-    catch (...)
-    {
-        free(mtx);
-        throw;
+        in >> mtx[i];
+        if (in.fail())
+        {
+            free(mtx);
+            in.close();
+            throw std::logic_error("err");
+        }
     }
     in.close();
     return mtx;
@@ -156,6 +154,57 @@ void petrov::cntnzrdig(char* b, int* mtx, size_t n)
     ou.close();
 }
 
+bool petrov::processStaticArray(char* inputFile, char* outputFile)
+{
+    std::ifstream in(inputFile);
+    if (!in.is_open())
+    {
+        return false;
+    }
+    size_t b, c;
+    in >> b >> c;
+    if (in.fail() || in.eof())
+    {
+        in.close();
+        return false;
+    }
+    if (b == 0 || c == 0)
+    {
+        std::ofstream ou(outputFile);
+        ou << 0;
+        ou << "\n" << 0 << " " << 0 << " ";
+        ou.close();
+        in.close();
+        return true;
+    }
+    size_t n = (b > c) ? c : b;
+    const size_t MAX_SIZE = 1000;
+    if (n > MAX_SIZE)
+    {
+        in.close();
+        return false;
+    }
+    int staticMtx[MAX_SIZE * MAX_SIZE];
+    for (size_t i = 0; i < n * n; ++i)
+    {
+        if (in.eof())
+        {
+            in.close();
+            return false;
+        }
+        in >> staticMtx[i];
+        if (in.fail())
+        {
+            in.close();
+            return false;
+        }
+    }
+    in.close();
+    fillincway(outputFile, staticMtx, n);
+    cntnzrdig(outputFile, staticMtx, n);
+    return true;
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 4)
@@ -183,45 +232,46 @@ int main(int argc, char** argv)
     {
         int* mtx = nullptr;
         size_t n = 0;
+        bool success = false;
         try
         {
             mtx = petrov::makemtx(argv[2]);
             std::ifstream in(argv[2]);
             if (in.is_open())
             {
-                size_t b, c;
-                in >> b >> c;
+                size_t b, c_val;
+                in >> b >> c_val;
                 if (!in.fail())
                 {
-                    n = (b > c) ? c : b;
+                    n = (b > c_val) ? c_val : b;
                 }
                 in.close();
             }
+            petrov::fillincway(argv[3], mtx, n);
+            petrov::cntnzrdig(argv[3], mtx, n);
+            success = true;
         }
         catch(const std::exception& e)
         {
             std::cerr << "err\n";
-            return 2;
         }
         catch(...)
         {
             std::cerr << "err\n";
-            return 2;
         }
-        petrov::fillincway(argv[3], mtx, n);
-        petrov::cntnzrdig(argv[3], mtx, n);
         if (mtx != nullptr)
         {
             free(mtx);
         }
-        return 0;
+        return success ? 0 : 2;
     }
     else if (c == 2)
     {
-        std::ofstream ou(argv[3]);
-        ou << 0;
-        ou << "\n" << 0 << " " << 0 << " ";
-        ou.close();
+        if (!petrov::processStaticArray(argv[2], argv[3]))
+        {
+            std::cerr << "err\n";
+            return 2;
+        }
         return 0;
     }
 }
