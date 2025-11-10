@@ -110,4 +110,8 @@ int main(int argc, char** argv)
             return 2;
         }
     }
+    if (c == 2)
+    {
+      freemtx(mtx);
+    }
 }
