@@ -206,7 +206,7 @@ int main(int argc, char** argv)
         {
             petrov::makestatmtx(in, rows, cols, statmtx);
         }
-        catch(std::logic_error)
+        catch(const std::logic_error&)
         {
             return 0;
         }
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
         {
             mtx = petrov::makemtx(in, rows, cols);
         }
-        catch(std::logic_error)
+        catch(const std::logic_error&)
         {
             return 0;
         }
