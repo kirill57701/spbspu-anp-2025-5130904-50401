@@ -29,9 +29,18 @@ bool petrov::isitnum(char* a)
 
 int petrov::gettypemass(char* a)
 {
-    if (a[0] == '1' && a[1] == '\0'){return 1;}
-    else if(a[0] == '2' && a[1] == '\0'){return 2;}
-    else{return -1;}
+    if (a[0] == '1' && a[1] == '\0')
+    {
+        return 1;
+    }
+    else if(a[0] == '2' && a[1] == '\0')
+    {
+        return 2;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
