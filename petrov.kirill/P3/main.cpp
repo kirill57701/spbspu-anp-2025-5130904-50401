@@ -224,10 +224,6 @@ int main(int argc, char** argv)
             std::cerr << "err\n";
             return 2;
         }
-        in.close();
-        std::ofstream ou(argv[3]);
-        petrov::fll_inc_way(ou, statmtx, rows, cols);
-        petrov::cnt_nzr_dig(ou, statmtx, rows, cols);
     }
     else
     {
@@ -252,11 +248,11 @@ int main(int argc, char** argv)
             std::cerr << "err\n";
             return 2;
         }
-        in.close();
-        std::ofstream ou(argv[3]);
-        petrov::fll_inc_way(ou, mtx, rows, cols);
-        petrov::cnt_nzr_dig(ou, mtx, rows, cols);
     }
+    in.close();
+    std::ofstream ou(argv[3]);
+    petrov::fll_inc_way(ou, (c == 1 ? statmtx : mtx), rows, cols);
+    petrov::cnt_nzr_dig(ou, (c == 1 ? statmtx : mtx), rows, cols);
     if (c == 2)
     {
         free(mtx);
