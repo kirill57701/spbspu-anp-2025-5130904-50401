@@ -5,15 +5,15 @@
 
 namespace petrov
 {
-    bool isitnum(char* a);
-    int gettypemass(char* a);
-    void makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx);
-    int* makemtx(std::ifstream& in, size_t r, size_t c);
-    void fillincway(std::ofstream& ou, int* mtx, size_t r, size_t c);
-    void cntnzrdig(std::ofstream& ou, int* mtx, size_t r, size_t c);
+    bool is_it_num(char* a);
+    int get_type_mass(char* a);
+    void make_stat_mtx(std::ifstream& in, size_t r, size_t c, int * statmtx);
+    int* make_mtx(std::ifstream& in, size_t r, size_t c);
+    void fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c);
+    void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
 }
 
-bool petrov::isitnum(char* a)
+bool petrov::is_it_num(char* a)
 {
     size_t i = 0;
     while (a[i] != '\0')
@@ -27,7 +27,7 @@ bool petrov::isitnum(char* a)
     return 1;
 }
 
-int petrov::gettypemass(char* a)
+int petrov::get_type_mass(char* a)
 {
     if (a[0] == '1' && a[1] == '\0')
     {
@@ -43,9 +43,9 @@ int petrov::gettypemass(char* a)
     }
 }
 
-void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
+void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
 {
-    r = r > c ? c : r;
+    r = std::min(c, r);
     if (r == 0)
     {
         throw std::runtime_error("err");
@@ -73,12 +73,12 @@ void petrov::makestatmtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
     }
 }
 
-int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
+int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
 {
     int* mtx;
     int q;
     size_t w = r*c;
-    r = r > c ? c : r;
+    r = std::min(r, c);
     if (r == 0)
     {
         throw std::runtime_error("err");
@@ -119,7 +119,7 @@ int* petrov::makemtx(std::ifstream& in, size_t r, size_t c)
     return mtx;
 }
 
-void petrov::fillincway(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
 {
     size_t n = r > c ? c : r;
     size_t s = 0, q = 0;
@@ -148,9 +148,9 @@ void petrov::fillincway(std::ofstream& ou, int* mtx, size_t r, size_t c)
     ou << s;
 }
 
-void petrov::cntnzrdig(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
 {
-    r = r > c ? c : r;
+    r = std::min(r, c);
     size_t d = 1;
     while (d < r + 1)
     {
@@ -188,12 +188,12 @@ int main(int argc, char** argv)
         std::cerr << "Too many arguments\n";
         return 1;
     }
-    else if(!petrov::isitnum(argv[1]))
+    else if(!petrov::is_it_num(argv[1]))
     {
         std::cerr << "First parameter is not a number\n";
         return 1;
     }
-    int c = petrov::gettypemass(argv[1]);
+    int c = petrov::get_type_mass(argv[1]);
     if (c != 1 && c != 2)
     {
         std::cerr << "First parameter is out of range\n";
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
     {
         try
         {
-            petrov::makestatmtx(in, rows, cols, statmtx);
+            petrov::make_stat_mtx(in, rows, cols, statmtx);
         }
         catch(const std::runtime_error&)
         {
@@ -226,14 +226,14 @@ int main(int argc, char** argv)
         }
         in.close();
         std::ofstream ou(argv[3]);
-        petrov::fillincway(ou, statmtx, rows, cols);
-        petrov::cntnzrdig(ou, statmtx, rows, cols);
+        petrov::fll_inc_way(ou, statmtx, rows, cols);
+        petrov::cnt_nzr_dig(ou, statmtx, rows, cols);
     }
     else
     {
         try
         {
-            mtx = petrov::makemtx(in, rows, cols);
+            mtx = petrov::make_mtx(in, rows, cols);
         }
         catch(const std::runtime_error&)
         {
@@ -254,8 +254,8 @@ int main(int argc, char** argv)
         }
         in.close();
         std::ofstream ou(argv[3]);
-        petrov::fillincway(ou, mtx, rows, cols);
-        petrov::cntnzrdig(ou, mtx, rows, cols);
+        petrov::fll_inc_way(ou, mtx, rows, cols);
+        petrov::cnt_nzr_dig(ou, mtx, rows, cols);
     }
     if (c == 2)
     {
