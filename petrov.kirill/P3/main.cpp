@@ -13,6 +13,8 @@ namespace petrov
     void fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c);
     void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
     void write_output(std::ofstream& ou, size_t r, int* mtx);
+    void reform(size_t d, size_t r, int* mtx);
+    void count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, int* mtx);
 }
 
 bool petrov::is_it_num(char* a)
@@ -121,10 +123,8 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
     return mtx;
 }
 
-void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, int* mtx)
 {
-    size_t n = r > c ? c : r, s = 0, q = 0, i = 0, j = n - 1;
-    bool iszero = 1;
     while (q < n - 1)
     {
         while (i < n - 1)
@@ -145,6 +145,13 @@ void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
         }
         q++, s += iszero, i = n - 1 - q, j = q, iszero = 1;
     }
+}
+
+void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
+{
+    size_t n = std::min(r, c), s = 0, q = 0, i = 0, j = n - 1;
+    bool iszero = 1;
+    petrov::count_diagonal(q, s, i, j, n, iszero, mtx);
     ou << s;
 }
 
@@ -160,10 +167,8 @@ void petrov::write_output(std::ofstream& ou, size_t r, int* mtx)
     }
 }
 
-void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::reform(size_t d, size_t r, int* mtx)
 {
-    r = std::min(r, c);
-    size_t d = 1;
     while (d < r + 1)
     {
         for (size_t i = 0; i < r; ++i)
@@ -178,6 +183,13 @@ void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
         }
         d++;
     }
+}
+
+void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
+{
+    r = std::min(r, c);
+    size_t d = 1;
+    petrov::reform(d, r, mtx);
     petrov::write_output(ou, r, mtx);
 }
 
@@ -258,3 +270,4 @@ int main(int argc, char** argv)
     }
     return 0;
 }
+
