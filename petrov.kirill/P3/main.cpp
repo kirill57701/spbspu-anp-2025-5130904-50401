@@ -12,6 +12,7 @@ namespace petrov
     int* make_mtx(std::ifstream& in, size_t r, size_t c);
     void fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c);
     void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
+    void write_output(std::ofstream& ou, size_t r, int* mtx);
 }
 
 bool petrov::is_it_num(char* a)
@@ -122,9 +123,7 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
 
 void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
 {
-    size_t n = r > c ? c : r;
-    size_t s = 0, q = 0;
-    size_t i = 0, j = n - 1;
+    size_t n = r > c ? c : r, s = 0, q = 0, i = 0, j = n - 1;
     bool iszero = 1;
     while (q < n - 1)
     {
@@ -149,6 +148,18 @@ void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
     ou << s;
 }
 
+void petrov::write_output(std::ofstream& ou, size_t r, int* mtx)
+{
+    ou << "\n" << r << " " << r << " ";
+    for (size_t i = 0; i < r; ++i)
+    {
+        for (size_t j = 0; j < r; ++j)
+        {
+            ou << mtx[i*r + j] << " ";
+        }
+    }
+}
+
 void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
 {
     r = std::min(r, c);
@@ -167,14 +178,7 @@ void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
         }
         d++;
     }
-    ou << "\n" << r << " " << r << " ";
-    for (size_t i = 0; i < r; ++i)
-    {
-        for (size_t j = 0; j < r; ++j)
-        {
-            ou << mtx[i*r + j] << " ";
-        }
-    }
+    petrov::write_output(ou, r, mtx);
 }
 
 int main(int argc, char** argv)
