@@ -18,7 +18,7 @@ bool petrov::is_it_num(char* a)
     size_t i = 0;
     while (a[i] != '\0')
     {
-        if (a[i] < '0' || a[i] > '9')
+        if (!isdigit(a[i])) 
         {
             return 0;
         }
@@ -235,12 +235,6 @@ int main(int argc, char** argv)
         {
             free(mtx);
             return 0;
-        }
-        catch(const std::bad_alloc&)
-        {
-            free(mtx);
-            std::cerr << "err\n";
-            return 3;
         }
         catch(...)
         {
