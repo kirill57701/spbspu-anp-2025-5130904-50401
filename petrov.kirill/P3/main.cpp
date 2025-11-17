@@ -2,6 +2,7 @@
 #include <memory>
 #include <cstddef>
 #include <fstream>
+#include <locale>
 
 namespace petrov
 {
