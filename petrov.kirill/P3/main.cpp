@@ -2,6 +2,7 @@
 #include <memory>
 #include <cstddef>
 #include <fstream>
+#include <locale>
 
 namespace petrov
 {
@@ -18,7 +19,7 @@ bool petrov::is_it_num(char* a)
     size_t i = 0;
     while (a[i] != '\0')
     {
-        if (a[i] < '0' || a[i] > '9') 
+        if (!isdigit(a[i]))
         {
             return 0;
         }
