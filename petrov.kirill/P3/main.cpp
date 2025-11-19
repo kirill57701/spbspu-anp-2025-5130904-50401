@@ -8,7 +8,7 @@ namespace petrov
 {
     bool is_it_num(char* a);
     int get_type_mass(char* a);
-    void make_stat_mtx(std::ifstream& in, size_t r, size_t c, int * statmtx);
+    void make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx);
     int* make_mtx(std::ifstream& in, size_t r, size_t c);
     void fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c);
     void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
@@ -47,7 +47,7 @@ int petrov::get_type_mass(char* a)
     }
 }
 
-void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int * statmtx)
+void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
 {
     r = std::min(c, r);
     if (r == 0)
@@ -200,12 +200,12 @@ int main(int argc, char** argv)
         std::cerr << "Not enough arguments\n";
         return 1;
     }
-    else if(argc > 4)
+    else if (argc > 4)
     {
         std::cerr << "Too many arguments\n";
         return 1;
     }
-    else if(!petrov::is_it_num(argv[1]))
+    else if (!petrov::is_it_num(argv[1]))
     {
         std::cerr << "First parameter is not a number\n";
         return 1;
@@ -232,11 +232,11 @@ int main(int argc, char** argv)
         {
             petrov::make_stat_mtx(in, rows, cols, statmtx);
         }
-        catch(const std::runtime_error&)
+        catch (const std::runtime_error&)
         {
             return 0;
         }
-        catch(...)
+        catch (...)
         {
             std::cerr << "err\n";
             return 2;
@@ -248,12 +248,12 @@ int main(int argc, char** argv)
         {
             mtx = petrov::make_mtx(in, rows, cols);
         }
-        catch(const std::runtime_error&)
+        catch (const std::runtime_error&)
         {
             free(mtx);
             return 0;
         }
-        catch(...)
+        catch (...)
         {
             free(mtx);
             std::cerr << "err\n";
