@@ -37,7 +37,7 @@ int petrov::get_type_mass(char* a)
     {
         return 1;
     }
-    else if(a[0] == '2' && a[1] == '\0')
+    else if (a[0] == '2' && a[1] == '\0')
     {
         return 2;
     }
