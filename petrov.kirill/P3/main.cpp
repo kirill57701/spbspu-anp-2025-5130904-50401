@@ -34,18 +34,18 @@ bool petrov::is_it_num(char* a)
 
 int petrov::get_type_mass(char* a)
 {
-    if (a[0] == '1' && a[1] == '\0')
-    {
-      return 1;
-    }
-    else if (a[0] == '2' && a[1] == '\0')
-    {
-      return 2;
-    }
-    else
-    {
-      return -1;
-    }
+  if (a[0] == '1' && a[1] == '\0')
+  {
+    return 1;
+  }
+  else if (a[0] == '2' && a[1] == '\0')
+  {
+    return 2;
+  }
+  else
+  {
+    return -1;
+  }
 }
 
 void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
@@ -124,11 +124,11 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
   for (size_t i = r * r; i < w; ++i)
   {
     if (in.eof())
-      {
-        free(mtx);
-        throw std::logic_error("err");
-      }
-      in >> q;
+    {
+      free(mtx);
+      throw std::logic_error("err");
+    }
+    in >> q;
   }
   if (in.fail())
   {
@@ -192,17 +192,17 @@ void petrov::reform(size_t d, size_t r, int* mtx)
 {
   while (d < r + 1)
   {
-  for (size_t i = 0; i < r; ++i)
-  {
-    for (size_t j = 0; j < r; ++j)
+    for (size_t i = 0; i < r; ++i)
     {
-      if (i >= d - 1 && i < r - d + 1 && j >= d - 1 && j < r - d + 1)
+      for (size_t j = 0; j < r; ++j)
       {
-        mtx[i * r + j]++;
+        if (i >= d - 1 && i < r - d + 1 && j >= d - 1 && j < r - d + 1)
+        {
+          mtx[i * r + j]++;
+        }
       }
     }
-  }
-  d++;
+    d++;
   }
 }
 
