@@ -87,7 +87,6 @@ size_t petrov::fill_massive(size_t r, std::ifstream& in, int* mtx, size_t s)
         {
             if (in.eof())
             {
-                free(mtx);
                 throw std::logic_error("err");
             }
             in >> mtx[i*r + j];
