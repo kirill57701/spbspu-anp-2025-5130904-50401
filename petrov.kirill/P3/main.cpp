@@ -61,7 +61,8 @@ void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
         {
             if (in.eof())
             {
-                throw(std::logic_error("err"));
+                in.fail();
+                return;
             }
             in >> statmtx[i * r + j];
             s++;
@@ -237,6 +238,11 @@ int main(int argc, char** argv)
             return 0;
         }
         catch (...)
+        {
+            std::cerr << "err\n";
+            return 2;
+        }
+        if (in.fail())
         {
             std::cerr << "err\n";
             return 2;
