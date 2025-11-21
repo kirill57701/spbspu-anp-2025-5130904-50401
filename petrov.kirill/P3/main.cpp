@@ -61,7 +61,7 @@ void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
         {
             if (in.eof())
             {
-                in.fail();
+                in.setstate(std::ios::failbit);
                 return;
             }
             in >> statmtx[i * r + j];
