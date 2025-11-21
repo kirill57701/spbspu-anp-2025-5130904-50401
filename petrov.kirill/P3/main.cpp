@@ -15,7 +15,7 @@ namespace petrov
     void write_output(std::ofstream& ou, size_t r, int* mtx);
     void reform(size_t d, size_t r, int* mtx);
     void count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, int* mtx);
-    void fill_massive(size_t r, std::ifstream& in, int* mtx, size_t& s);
+    size_t fill_massive(size_t r, std::ifstream& in, int* mtx, size_t s);
 }
 
 bool petrov::is_it_num(char* a)
@@ -79,7 +79,7 @@ void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
     }
 }
 
-void fill_massive(size_t r, std::ifstream& in, int* mtx, size_t& s)
+size_t petrov::fill_massive(size_t r, std::ifstream& in, int* mtx, size_t s)
 {
     for (size_t i = 0; i < r; ++i)
     {
@@ -94,6 +94,7 @@ void fill_massive(size_t r, std::ifstream& in, int* mtx, size_t& s)
             s++;
         }
     }
+    return s;
 }
 
 int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
@@ -114,7 +115,7 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
     size_t s = 0;
     try
     {
-        petrov::fill_massive(r, in, mtx, s);
+        s = petrov::fill_massive(r, in, mtx, s);
     }
     catch (...)
     {
