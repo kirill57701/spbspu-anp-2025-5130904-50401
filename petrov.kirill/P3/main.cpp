@@ -89,7 +89,7 @@ size_t petrov::fill_massive(size_t r, std::ifstream& in, int* mtx, size_t s)
       {
         throw std::logic_error("err");
       }
-      in >> mtx[i*r + j];
+      in >> mtx[i * r + j];
       s++;
     }
   }
@@ -100,13 +100,13 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
 {
   int* mtx;
   int q;
-  size_t w = r*c;
+  size_t w = r * c;
   r = std::min(r, c);
   if (r == 0)
   {
     throw std::runtime_error("err");
   }
-  mtx = reinterpret_cast<int*>(malloc(sizeof(int)*r*r));
+  mtx = reinterpret_cast<int*>(malloc(sizeof(int) * r * r));
   if (mtx == nullptr)
   {
     throw std::bad_alloc();
@@ -121,7 +121,7 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
     free(mtx);
     throw std::logic_error("err");
   }
-  for (size_t i = r*r; i < w; ++i)
+  for (size_t i = r * r; i < w; ++i)
   {
     if (in.eof())
       {
@@ -144,7 +144,7 @@ void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, b
   {
     while (i < n - 1)
     {
-      if (mtx[i*n + j] == 0)
+      if (mtx[i * n + j] == 0)
       {
         iszero = 0;
       }
@@ -158,7 +158,7 @@ void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, b
   {
     while (j < n - 1)
     {
-      if (mtx[i*n + j] == 0)
+      if (mtx[i * n + j] == 0)
       {
         iszero = 0;
       }
@@ -183,7 +183,7 @@ void petrov::write_output(std::ofstream& ou, size_t r, int* mtx)
   {
     for (size_t j = 0; j < r; ++j)
     {
-      ou << mtx[i*r + j] << " ";
+      ou << mtx[i * r + j] << " ";
     }
   }
 }
@@ -198,7 +198,7 @@ void petrov::reform(size_t d, size_t r, int* mtx)
     {
       if (i >= d - 1 && i < r - d + 1 && j >= d - 1 && j < r - d + 1)
       {
-        mtx[i*r + j]++;
+        mtx[i * r + j]++;
       }
     }
   }
@@ -246,7 +246,7 @@ int main(int argc, char** argv)
     return 2;
   }
   int statmtx[10000];
-  int * mtx = nullptr;
+  int* mtx = nullptr;
   if (c == 1)
   {
     try
