@@ -61,13 +61,13 @@ void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
         {
             if (in.eof())
             {
-                throw std::logic_error("err");
+                throw(std::logic_error("err"));
             }
-            in >> statmtx[i*r + j];
+            in >> statmtx[i * r + j];
             s++;
         }
     }
-    if (s < r*r)
+    if (s < r * r)
     {
         throw std::logic_error("err");
     }
