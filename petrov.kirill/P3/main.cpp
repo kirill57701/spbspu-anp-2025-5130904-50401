@@ -239,6 +239,7 @@ int main(int argc, char** argv)
     catch (const std::runtime_error&)
     {
       free(mtx);
+      mtx = nullptr;
       return 0;
     }
     catch (...)
