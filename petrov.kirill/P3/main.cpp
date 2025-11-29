@@ -6,49 +6,17 @@
 
 namespace petrov
 {
-  bool is_it_num(char* a);
-  int get_type_mass(char* a);
-  void make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx);
+  void make_fixed_length_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx);
   int* make_mtx(std::ifstream& in, size_t r, size_t c);
-  void fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c);
-  void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
-  void write_output(std::ofstream& ou, size_t r, int* mtx);
+  void fll_inc_way(std::ofstream& ou, const int* mtx, size_t r, size_t c);
+  void cnt_nzr_dig(std::ofstream& ou, const int* mtx, size_t r, size_t c);
+  void write_output(std::ofstream& ou, size_t r, const int* mtx);
   void reform(size_t d, size_t r, int* mtx);
-  void count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, int* mtx);
+  void count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, const int* mtx);
   size_t fill_massive(size_t r, std::ifstream& in, int* mtx, size_t s);
 }
 
-bool petrov::is_it_num(char* a)
-{
-  size_t i = 0;
-  while (a[i] != '\0')
-  {
-    if (!isdigit(a[i]))
-    {
-      return 0;
-    }
-      i++;
-  }
-  return 1;
-}
-
-int petrov::get_type_mass(char* a)
-{
-  if (a[0] == '1' && a[1] == '\0')
-  {
-    return 1;
-  }
-  else if (a[0] == '2' && a[1] == '\0')
-  {
-    return 2;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
-void petrov::make_stat_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
+void petrov::make_fixed_length_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx)
 {
   r = std::min(c, r);
   if (r == 0)
@@ -104,7 +72,7 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
   r = std::min(r, c);
   if (r == 0)
   {
-    throw std::runtime_error("err");
+    return nullptr;
   }
   mtx = reinterpret_cast<int*>(malloc(sizeof(int) * r * r));
   if (mtx == nullptr)
@@ -119,26 +87,26 @@ int* petrov::make_mtx(std::ifstream& in, size_t r, size_t c)
   catch (...)
   {
     free(mtx);
-    throw std::logic_error("err");
+    return nullptr;
   }
   for (size_t i = r * r; i < w; ++i)
   {
     if (in.eof())
     {
       free(mtx);
-      throw std::logic_error("err");
+      return nullptr;
     }
     in >> q;
   }
   if (in.fail())
   {
     free(mtx);
-    throw std::logic_error("err");
+    return nullptr;
   }
   return mtx;
 }
 
-void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, int* mtx)
+void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, const int* mtx)
 {
   while (q < n - 1)
   {
@@ -176,7 +144,7 @@ void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
   ou << s;
 }
 
-void petrov::write_output(std::ofstream& ou, size_t r, int* mtx)
+void petrov::write_output(std::ofstream& ou, size_t r, const int* mtx)
 {
   ou << "\n" << r << " " << r << " ";
   for (size_t i = 0; i < r; ++i)
@@ -226,13 +194,7 @@ int main(int argc, char** argv)
     std::cerr << "Too many arguments\n";
     return 1;
   }
-  else if (!petrov::is_it_num(argv[1]))
-  {
-    std::cerr << "First parameter is not a number\n";
-    return 1;
-  }
-  int c = petrov::get_type_mass(argv[1]);
-  if (c != 1 && c != 2)
+  if (!((argv[1][0] == '1' && argv[1][1] == '\0') || (argv[1][0] == '2' && argv[1][1] == '\0')))
   {
     std::cerr << "First parameter is out of range\n";
     return 1;
@@ -247,11 +209,11 @@ int main(int argc, char** argv)
   }
   int statmtx[10000];
   int* mtx = nullptr;
-  if (c == 1)
+  if (argv[1][0] == '1')
   {
     try
     {
-      petrov::make_stat_mtx(in, rows, cols, statmtx);
+      petrov::make_fixed_length_mtx(in, rows, cols, statmtx);
     }
     catch (const std::runtime_error&)
     {
@@ -274,7 +236,7 @@ int main(int argc, char** argv)
     {
       mtx = petrov::make_mtx(in, rows, cols);
     }
-    catch (const std::runtime_error&)
+    catch (const std::bad_alloc&)
     {
       free(mtx);
       return 0;
@@ -282,15 +244,16 @@ int main(int argc, char** argv)
     catch (...)
     {
       free(mtx);
+      mtx = nullptr;
       std::cerr << "err\n";
       return 2;
     }
   }
   in.close();
   std::ofstream ou(argv[3]);
-  petrov::fll_inc_way(ou, (c == 1 ? statmtx : mtx), rows, cols);
-  petrov::cnt_nzr_dig(ou, (c == 1 ? statmtx : mtx), rows, cols);
-  if (c == 2)
+  petrov::fll_inc_way(ou, (argv[1][0] == '1' ? statmtx : mtx), rows, cols);
+  petrov::cnt_nzr_dig(ou, (argv[1][0] == '1' ? statmtx : mtx), rows, cols);
+  if (argv[1][0] == '2')
   {
     free(mtx);
   }
