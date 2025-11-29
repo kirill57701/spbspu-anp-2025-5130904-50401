@@ -9,7 +9,7 @@ namespace petrov
   void make_fixed_length_mtx(std::ifstream& in, size_t r, size_t c, int* statmtx);
   int* make_mtx(std::ifstream& in, size_t r, size_t c);
   void fll_inc_way(std::ofstream& ou, const int* mtx, size_t r, size_t c);
-  void cnt_nzr_dig(std::ofstream& ou, const int* mtx, size_t r, size_t c);
+  void cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c);
   void write_output(std::ofstream& ou, size_t r, const int* mtx);
   void reform(size_t d, size_t r, int* mtx);
   void count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, bool iszero, const int* mtx);
@@ -174,7 +174,7 @@ void petrov::reform(size_t d, size_t r, int* mtx)
   }
 }
 
-void petrov::cnt_nzr_dig(std::ofstream& ou, const int* mtx, size_t r, size_t c)
+void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
 {
   r = std::min(r, c);
   size_t d = 1;
