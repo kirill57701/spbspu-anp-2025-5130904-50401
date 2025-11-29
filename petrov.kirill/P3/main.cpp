@@ -136,7 +136,7 @@ void petrov::count_diagonal(size_t q, size_t& s, size_t i, size_t j, size_t n, b
   }
 }
 
-void petrov::fll_inc_way(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::fll_inc_way(std::ofstream& ou, const int* mtx, size_t r, size_t c)
 {
   size_t n = std::min(r, c), s = 0, q = 0, i = 0, j = n - 1;
   bool iszero = 1;
@@ -174,7 +174,7 @@ void petrov::reform(size_t d, size_t r, int* mtx)
   }
 }
 
-void petrov::cnt_nzr_dig(std::ofstream& ou, int* mtx, size_t r, size_t c)
+void petrov::cnt_nzr_dig(std::ofstream& ou, const int* mtx, size_t r, size_t c)
 {
   r = std::min(r, c);
   size_t d = 1;
